@@ -14,7 +14,6 @@ Path to innawoods POC
   - [ ] Receive
   - [ ] Config
 - [ ] TCP Tunnel for ATAK
-- [ ] Scrollback on OLED
 
 Path to 1.0
 ---
