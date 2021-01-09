@@ -4,7 +4,9 @@ const protobuf = require('protobufjs');
 var MaquisProto = new protobuf.Type("MaquisProto");
 MaquisProto.add(new protobuf.Field("body", 1, "string"));
 MaquisProto.add(new protobuf.Field("sid", 2, "string"));
-MaquisProto.add(new protobuf.Field("sig", 3, "string"));
+MaquisProto.add(new protobuf.Field("ts", 3, "double"));
+MaquisProto.add(new protobuf.Field("sig", 4, "string"));
+MaquisProto.add(new protobuf.Field("requestAck", 5, "bool"));
 
 class MaquisPacket {
   static encode(message) {
@@ -24,6 +26,7 @@ class MaquisPacket {
     let packetBuf = new Uint8Array(packet);
     if (packetBuf[0] == 0x00) {
       var decodedMessage = MaquisProto.decode(packetBuf.slice(1));
+
       return decodedMessage;
     } else {
       console.error('Unknown packet version: ', packetBuf[0]);

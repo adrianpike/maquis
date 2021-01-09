@@ -43,15 +43,18 @@ TODO
  [+] Protobuf
  [+] Styling
  [ ] Retransmit
+ [ ] Key import or generation
  [ ] Error log
+  [ ] Unable to transmit
+  [ ] Malformed receive
+ [ ] Request ack mode
  [ ] Save last N messages
  [ ] Clear messages
- [ ] Key import or generation
  [ ] Hard wipe
  [ ] Message signing (WebCrypto + AESGCM)
+ [ ] Automated testing & deployment.
  [ ] websocket mode to be backed by [ something else ]
  [ ] Extend Webjack to speak AX.25
- [ ] KISS mode
 
 
 

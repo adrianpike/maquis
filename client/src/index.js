@@ -32,7 +32,30 @@ class MessageLog extends Component {
   render({messages}) {
     return <div id="messageLog">
       { messages.slice(0).reverse().map(function(msg) {
-       return <div class="message">{msg.sid} - {msg.body}</div>
+/*
+{
+  sid: sender
+  receivedAt: new Date()
+  ts: sent at
+  deliveryStatus: [ received, sent w/o ack, sent pending ack, sent & acked ]
+  body
+} */
+
+let deliveryStatusIcon = '';
+let retransmitButton = <div class="retransmitButton">Retransmit</div>
+
+       return <div class="message">
+        <div class="sender">{msg.sid}</div>
+        <div class="timestamp">
+          {msg.ts}
+          <span>{msg.receivedAt}</span>
+        </div>
+        <div class="controls">
+          {deliveryStatusIcon}
+          {retransmitButton}
+        </div>
+        <div class="body">{msg.body}</div>
+        </div>
       }) }
     </div>
   }
@@ -108,6 +131,19 @@ class ConfigPane extends Component {
               this.setState({ sid: e.target.value });
             }}
           />
+        </label>
+
+        <label>Crypto Mode:
+          <select name="cryptoMode">
+              <option value="none" selected>None</option>
+              <option value="sign">Sign Messages</option>
+            </select>
+        </label>
+
+        <label>Private Key:
+          <textarea name="privateKey" value={this.state.privateKey} onChange={(e) => {
+            this.setState({ privateKey: e.target.value });
+          }}>{this.state.privateKey}</textarea>
         </label>
         
         <input type="submit" value="Save" />
