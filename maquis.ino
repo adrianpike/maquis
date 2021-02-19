@@ -1,3 +1,6 @@
+/* This is firmware to run on a Heltec ESP32 LoRa chipset
+*/
+
 #include "heltec.h"
 #include "WiFi.h"
 #include "SPIFFS.h"
