@@ -42,6 +42,8 @@ TODO
  [+] Basic configuration & persistence
  [+] Protobuf
  [+] Styling
+ [ ] websocket mode to be backed by kiss-bridge
+ [ ] raw message mode, bypass protobufs
  [ ] Retransmit
  [ ] Key import or generation
  [ ] Error log
@@ -53,7 +55,6 @@ TODO
  [ ] Hard wipe
  [ ] Message signing (WebCrypto + AESGCM)
  [ ] Automated testing & deployment.
- [ ] websocket mode to be backed by [ something else ]
  [ ] Extend Webjack to speak AX.25
 
 

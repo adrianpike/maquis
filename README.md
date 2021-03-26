@@ -22,24 +22,25 @@ Outputs include;
  - Browser-based AFSK
    - TODO: X.25 Framing on the browser
 
-
 Directory Structure
 ---
 
 /client - The JS client itself.
 /esp32 - Firmware to run a server component on an ESP32
-/server - The server service, set up to be a Balena set of containers.
+/server - The server containers and tooling to burn an image for a Pi.
 
 Path to 1.0
 ---
 
+- [ ] Mapping tool
 - [ ] TCP Tunnel for ATAK
-- [ ] Clear all TODOs and verify zero known bugs
+- [ ] Clear all client & server TODOs and verify zero known bugs
 - [ ] Encryption
-- [ ] Clean up build toolchain, get away from Arduino IDE, probably onto PlatformIO?
+- [ ] Github Actions-based CI for ready-made images.
 
 Path to 2.0
 ---
 
-- [ ] Interoperability with https://www.meshtastic.org/
-- [ ] Durable packet delivery on AFSK method
+- [ ] Tighter interop with disaster.radio and Meshtastic
+- [ ] Stronger delivery guarantees
+- [ ] Basic routing across output modes.

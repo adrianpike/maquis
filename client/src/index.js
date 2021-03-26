@@ -4,11 +4,12 @@ import './style.css';
 
 const MaquisPacket = require('./maquis-packet.js');
 
-
 // Modes
 const Acoustic = require('./acoustic.js');
 let acoustic = new Acoustic();
-//const Websocket = require('./websocket.js');
+
+const Websocket = require('./websocket.js');
+let websocket = new Websocket();
 
 class MessageComposer extends Component {
   render(props, { text }) {
@@ -122,6 +123,7 @@ class ConfigPane extends Component {
         <label>Operating Mode:
           <select name="mode">
             <option value="Acoustic" selected>Acoustic</option>
+            <option value="Websocket">Websocket</option>
           </select>
         </label>
 
@@ -189,17 +191,20 @@ class MaquisBase extends Component {
       let message = MaquisPacket.decode(packet);
       this.setState({ messages: this.state.messages.concat([message]) });
     }
+
   }
 
   render() {
-    let channel = acoustic;
+//    let channel = acoustic;
+
+    let channel = websocket;
     return <div id="maquis">
       <div id="header">
         <a id="logo" href="#" onClick={() => {
           this.setState({ configVisible: true });
         }}>maquis</a>
         <ChannelStatus channel={channel} onConnect={() => {
-          this.setState({ connected: true}); 
+          this.setState({ connected: true }); 
         }} />
       </div>
       {this.state.configVisible &&
