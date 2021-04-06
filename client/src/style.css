@@ -59,4 +59,10 @@ input[type=submit], input[type=button] {
 
 #messageLog .message {
   padding:5px;
+  border-bottom:1px solid #39393b;
+  position:relative;
+}
+
+#messageLog .controls {
+  top: 5px; right:5px; position: absolute;
 }

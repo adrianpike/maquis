@@ -37,14 +37,11 @@ It's a protobuf, potentially encrypted.
 TODO
 ---
 
- [+] Basic send/receive for v0
- [+] webjack mode, 300baud
- [+] Basic configuration & persistence
- [+] Protobuf
- [+] Styling
- [ ] websocket mode to be backed by kiss-bridge
- [ ] raw message mode, bypass protobufs
+ [ ] websocket mode to be backed by kiss-bridge, including metadata about underlying transport
+ [ ] Request Ack mode
+ [ ] Question, should I revisit the whole protobuf idea?
  [ ] Retransmit
+ [ ] raw message mode, bypass protobufs
  [ ] Key import or generation
  [ ] Error log
   [ ] Unable to transmit
@@ -57,9 +54,3 @@ TODO
  [ ] Automated testing & deployment.
  [ ] Extend Webjack to speak AX.25
 
-
-
-/// 
-      <textarea onChange={(e) => {
-        this.setState({ text: e.target.value });
-      }}>{this.state.text}</textarea>

@@ -32,7 +32,7 @@ class MessageComposer extends Component {
 class MessageLog extends Component {
   render({messages}) {
     return <div id="messageLog">
-      { messages.slice(0).reverse().map(function(msg) {
+      { messages.slice(1).reverse().map(function(msg) {
 /*
 {
   sid: sender
@@ -117,13 +117,17 @@ class ConfigPane extends Component {
     return <div id="config">
       <form onSubmit={(e) => {
         e.preventDefault();
+        console.log(this.state);
         onSubmit(this.state);
         return false;
       }}>
         <label>Operating Mode:
-          <select name="mode">
-            <option value="Acoustic" selected>Acoustic</option>
-            <option value="Websocket">Websocket</option>
+          <select name="mode" value={this.state.mode} onChange={(e) => {
+            this.setState({ mode: e.target.value }); 
+          }}>
+            { ['Acoustic', 'Websocket'].map((mode) => {
+              return <option value={mode}>{mode}</option>;
+            }) }
           </select>
         </label>
 
@@ -139,6 +143,7 @@ class ConfigPane extends Component {
           <select name="cryptoMode">
               <option value="none" selected>None</option>
               <option value="sign">Sign Messages</option>
+              <option value="encrypt">Encrypt Messages</option>
             </select>
         </label>
 
@@ -158,7 +163,7 @@ class MaquisBase extends Component {
   constructor() {
     super();
 
-    this.state = { // TODO: sync the whole state w/LocalStorage
+    this.state = {
       config: {
         mode: 'Acoustic',
         modeConfig: {
@@ -187,17 +192,27 @@ class MaquisBase extends Component {
       this.state.config[key] = persistentConfig[key];
     }
 
-    acoustic.onMessage = (packet) => {
+    switch(this.state.config['mode']) {
+      case 'Websocket':
+        this.channel = websocket;
+        break;
+      default:
+        this.channel = acoustic;
+    }
+
+    this.channel.onMessage = (packet) => {
       let message = MaquisPacket.decode(packet);
+      console.log(message);
+      if (message.requestAck && message.requestAck == true) {
+        // ack it!
+      }
       this.setState({ messages: this.state.messages.concat([message]) });
     }
 
   }
 
   render() {
-//    let channel = acoustic;
-
-    let channel = websocket;
+    let channel = this.channel;
     return <div id="maquis">
       <div id="header">
         <a id="logo" href="#" onClick={() => {
@@ -217,7 +232,8 @@ class MaquisBase extends Component {
       <MessageComposer onSubmit={(body) => {
         let message = {
           body: body,
-          sid: this.state.config.sid
+          sid: this.state.config.sid,
+          reequestAck: true
         }
         const packet = MaquisPacket.encode(message);
         this.setState({ messages: this.state.messages.concat([message]) }); // TODO: some indicator that it was sent rather than received :)
