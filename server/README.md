@@ -1,4 +1,4 @@
-The server components for a maquis host.
+The server components for a Maquis Pi.
 
 Base Host - ideally this could be done with either Balena -or- a base Pi burn
 - Docker install
