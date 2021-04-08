@@ -20,8 +20,7 @@ echo \
 
 sudo curl -L https://github.com/linuxserver/docker-docker-compose/releases/download/1.28.5-ls32/docker-compose-armhf | sudo tee /usr/local/bin/docker-compose
 
-apt-get update -y
-
-apt-get install -y docker-ce docker-ce-cli containerd.io
+sudo apt-get update -y
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
 sudo docker-compose up -d

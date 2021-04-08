@@ -33,7 +33,7 @@ Path to 1.0
 ---
 
 - [ ] Mapping tool
-- [ ] TCP Tunnel for ATAK
+- [ ] Client can config kiss-bridge
 - [ ] Clear all client & server TODOs and verify zero known bugs
 - [ ] Encryption
 - [ ] Github Actions-based CI for ready-made images.

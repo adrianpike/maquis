@@ -10,3 +10,4 @@ Containers;
 - kiss-bridge
 - direwolf
 
+TODO: subscribe in-container to outside of container takchat messages on 224.10.10.1
