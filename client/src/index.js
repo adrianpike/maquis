@@ -31,8 +31,10 @@ class MessageComposer extends Component {
 
 class MessageLog extends Component {
   render({messages}) {
+    console.log(messages);
+
     return <div id="messageLog">
-      { messages.slice(1).reverse().map(function(msg) {
+      { messages.slice(0).reverse().map(function(msg) {
 /*
 {
   sid: sender
@@ -85,17 +87,9 @@ class ConnectButton extends Component {
 }
 
 class ChannelStatus extends Component {
-  constructor({ channel }) {
-    super();
-
-    this.state = {
-      conncted: channel.connected
-    }
-  }
-
-  render({ channel, onConnect }) {
+  render({ channel, connected, onConnect }) {
     return <div id="channelStatus">
-      { this.state.connected ? 'Connected' : <ConnectButton 
+      { connected ? 'Connected' : <ConnectButton 
         channel={channel}
         success={() => { 
           this.setState( { connected: true });
@@ -117,7 +111,6 @@ class ConfigPane extends Component {
     return <div id="config">
       <form onSubmit={(e) => {
         e.preventDefault();
-        console.log(this.state);
         onSubmit(this.state);
         return false;
       }}>
@@ -202,11 +195,16 @@ class MaquisBase extends Component {
 
     this.channel.onMessage = (packet) => {
       let message = MaquisPacket.decode(packet);
-      console.log(message);
       if (message.requestAck && message.requestAck == true) {
         // ack it!
       }
       this.setState({ messages: this.state.messages.concat([message]) });
+    }
+
+    if (this.state.config['mode'] === 'Websocket') {
+      this.channel.connect(() => {
+        this.setState({ connected: true });
+      });
     }
 
   }
@@ -218,7 +216,7 @@ class MaquisBase extends Component {
         <a id="logo" href="#" onClick={() => {
           this.setState({ configVisible: true });
         }}>maquis</a>
-        <ChannelStatus channel={channel} onConnect={() => {
+        <ChannelStatus channel={channel} connected={this.state.connected} onConnect={() => {
           this.setState({ connected: true }); 
         }} />
       </div>
@@ -231,15 +229,19 @@ class MaquisBase extends Component {
       {this.state.connected ?
       <MessageComposer onSubmit={(body) => {
         let message = {
-          body: body,
+          body: body, // TODO: body can be geo coords
           sid: this.state.config.sid,
-          reequestAck: true
+          ts: new Date().getTime(),
+          sig: '', // TODO
+          requestAck: true
         }
         const packet = MaquisPacket.encode(message);
-        this.setState({ messages: this.state.messages.concat([message]) }); // TODO: some indicator that it was sent rather than received :)
         channel.transmit(packet);
+
+        // Probably need to translate message to an internal type here
+        this.setState({ messages: this.state.messages.concat([message]) }); 
       }} />
-      : <div id="disconnectionWarning">Backend disconnected.</div>
+      : <div id="disconnectionWarning">{this.state.config.mode} Backend disconnected.</div>
       }
       <MessageLog messages={this.state.messages} />
     </div>

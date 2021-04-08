@@ -13,14 +13,11 @@ sudo apt-get install -y \
     gnupg \
     lsb-release
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo \
-  "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sh hostapd/init.sh
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
 
 sudo curl -L https://github.com/linuxserver/docker-docker-compose/releases/download/1.28.5-ls32/docker-compose-armhf | sudo tee /usr/local/bin/docker-compose
-
-sudo apt-get update -y
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
+sudo chmod a+x /usr/local/bin/docker-compose
 sudo docker-compose up -d
