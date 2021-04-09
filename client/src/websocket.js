@@ -14,14 +14,15 @@ class Websocket {
     });
 
     this.socket.addEventListener('error', (err) => {
-      console.log(err);
+      cb(err);
+      this.connected = false;
     });
 
     this.socket.addEventListener('open', (evt) => {
+      cb();
       this.connected = true;
     });
 
-    cb();
   }
 
   transmit(message) {

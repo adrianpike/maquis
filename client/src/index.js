@@ -6,9 +6,9 @@ const MaquisPacket = require('./maquis-packet.js');
 
 // Modes
 const Acoustic = require('./acoustic.js');
-let acoustic = new Acoustic();
-
 const Websocket = require('./websocket.js');
+
+let acoustic = new Acoustic();
 let websocket = new Websocket();
 
 class MessageComposer extends Component {
