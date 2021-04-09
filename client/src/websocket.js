@@ -5,7 +5,7 @@ class Websocket {
   }
 
   connect(cb) {
-    this.socket = new WebSocket('ws://10.10.2.115:4242');
+    this.socket = new WebSocket(`ws://${document.location.hostname}:4242`);
     this.socket.binaryType = 'arraybuffer';
     this.socket.addEventListener('message', (evt) => {
       if (typeof(this.onMessage) === 'function') {
