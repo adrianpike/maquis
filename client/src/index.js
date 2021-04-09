@@ -31,20 +31,27 @@ class MessageComposer extends Component {
 
 class MessageLog extends Component {
   render({messages}) {
-    console.log(messages);
 
     return <div id="messageLog">
       { messages.slice(0).reverse().map(function(msg) {
-/*
-{
-  sid: sender
-  receivedAt: new Date()
-  ts: sent at
-  deliveryStatus: [ received, sent w/o ack, sent pending ack, sent & acked ]
-  body
-} */
 
-let deliveryStatusIcon = '';
+let directionIcon;
+if (msg.direction === 'outgoing') {
+  directionIcon = '⬆';
+} else {
+  directionIcon = '⬇';
+}
+
+let ackStatusIcon;
+if (msg.requestAck) {
+  if (msg.acked) {
+    ackStatusIcon = '+';
+  } else {
+    ackStatusIcon = '?';
+  }
+} else {
+  ackStatusIcon = '';
+}
 let retransmitButton = <div class="retransmitButton">Retransmit</div>
 
        return <div class="message">
@@ -54,7 +61,8 @@ let retransmitButton = <div class="retransmitButton">Retransmit</div>
           <span>{msg.receivedAt}</span>
         </div>
         <div class="controls">
-          {deliveryStatusIcon}
+          {directionIcon}
+          {ackStatusIcon}
           {retransmitButton}
         </div>
         <div class="body">{msg.body}</div>
@@ -145,6 +153,10 @@ class ConfigPane extends Component {
             this.setState({ privateKey: e.target.value });
           }}>{this.state.privateKey}</textarea>
         </label>
+
+        <label for="requestAck">Request Acknowledgement:
+          <input type="checkbox" name="requestAck" value="true" />
+        </label>
         
         <input type="submit" value="Save" />
       </form>
@@ -164,9 +176,9 @@ class MaquisBase extends Component {
           retransmit: 1
         },
         showRaw: true,
-        transmitProtocolVersion: 0, // We'll be backward-compatible to receive the last N protocols where N is my sanity :)
         privateKey: undefined,
         publicKey: undefined,
+        requestAck: false,
         sid: 'Spartacus', // TODO: https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
         cryptoMode: 'none' // { none, sign, full (but we need a given pubkey to target) } // todo: use signal protocol for v1
       },
@@ -193,11 +205,16 @@ class MaquisBase extends Component {
         this.channel = acoustic;
     }
 
-    this.channel.onMessage = (packet) => {
-      let message = MaquisPacket.decode(packet);
-      if (message.requestAck && message.requestAck == true) {
-        // ack it!
+    this.channel.onMessage = (rawPacket) => {
+      let packet = MaquisPacket.decode(rawPacket);
+      if (packet.requestAck && packet.requestAck == true) {
+        console.log('Received a message wanting an ack, doing so');
       }
+
+      let message = Object.assign({}, packet);
+      message.acked = false;
+      message.direction = 'incoming'; // Don't like this, maybe an enum?
+
       this.setState({ messages: this.state.messages.concat([message]) });
     }
 
@@ -222,26 +239,27 @@ class MaquisBase extends Component {
       </div>
       {this.state.configVisible &&
       <ConfigPane config={this.state.config} onSubmit={(newConfig) => {
-        // BUG: blows away existing default config, need to merge
-        this.setState({config: newConfig, configVisible: false});
+        this.setState({config: Object.assign({}, this.state.config, newConfig), configVisible: false});
         window.localStorage.setItem('config', JSON.stringify(newConfig));
       }} />}
       {this.state.connected ?
       <MessageComposer onSubmit={(body) => {
-        let message = {
-          body: body, // TODO: body can be geo coords
+        let packet = {
+          body: body, // TODO: body can be geo coords? How do we define different types of messages at this layer?
           sid: this.state.config.sid,
           ts: new Date().getTime(),
           sig: '', // TODO
           requestAck: true
         }
-        const packet = MaquisPacket.encode(message);
-        channel.transmit(packet);
+        const encodedPacket = MaquisPacket.encode(packet);
+        channel.transmit(encodedPacket);
 
-        // Probably need to translate message to an internal type here
+        let message = Object.assign({}, packet);
+        message.acked = false;
+        message.direction = 'outgoing'; // Don't like this
         this.setState({ messages: this.state.messages.concat([message]) }); 
       }} />
-      : <div id="disconnectionWarning">{this.state.config.mode} Backend disconnected.</div>
+      : <div id="disconnectionWarning">{this.state.config.mode} Backend <strong>not connected</strong>.</div>
       }
       <MessageLog messages={this.state.messages} />
     </div>

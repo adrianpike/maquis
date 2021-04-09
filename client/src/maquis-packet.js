@@ -1,12 +1,20 @@
 const protobuf = require('protobufjs');
 
 // TODO: extract this into a .proto file
-var MaquisProto = new protobuf.Type("MaquisProto");
-MaquisProto.add(new protobuf.Field("body", 1, "string"));
-MaquisProto.add(new protobuf.Field("sid", 2, "string"));
-MaquisProto.add(new protobuf.Field("ts", 3, "double"));
-MaquisProto.add(new protobuf.Field("sig", 4, "string"));
-MaquisProto.add(new protobuf.Field("requestAck", 5, "bool"));
+var MaquisMessage = new protobuf.Type("MaquisMessage");
+MaquisMessage.add(new protobuf.Field("body", 1, "string"));
+MaquisMessage.add(new protobuf.Field("sid", 2, "string"));
+MaquisMessage.add(new protobuf.Field("ts", 3, "double"));
+MaquisMessage.add(new protobuf.Field("sig", 4, "string"));
+MaquisMessage.add(new protobuf.Field("requestAck", 5, "bool"));
+
+var AckProto = new protbuf.Type('MaquisAck');
+AckProto.add(new protobuf.Field('sig', 1, 'string'));
+AckProto.add(new protobuf.Field('acker_id', 2, 'string'));
+AckProto.add(new protobuf.Field("ts", 3, "double"));
+
+var MaquisProto = new protobuf.types("MaquisProto");
+MaquisProto.add(new protobuf.Field("message", 1, "oneof"));
 
 class MaquisPacket {
   static encode(message) {
@@ -24,7 +32,7 @@ class MaquisPacket {
 
   static decode(packet) {
     let packetBuf = new Uint8Array(packet);
-    if (packetBuf[0] == 0x00) { // underlying layer is removing 0x00 D:
+    if (packetBuf[0] == 0x00) {
       var decodedMessage = MaquisProto.decode(packetBuf.slice(1));
       return decodedMessage;
     } else {
