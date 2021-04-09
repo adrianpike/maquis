@@ -6,13 +6,11 @@ class Websocket {
 
   connect(cb) {
     this.socket = new WebSocket('ws://10.10.2.115:4242');
+    this.socket.binaryType = 'arraybuffer';
     this.socket.addEventListener('message', (evt) => {
-      console.log(evt);
-      evt.data.text().then(function(text) {
-        if (typeof(this.onMessage) === 'function') {
-          this.onMessage(text);
-        }
-      });
+      if (typeof(this.onMessage) === 'function') {
+        this.onMessage(evt.data);
+      }
     });
 
     this.socket.addEventListener('error', (err) => {

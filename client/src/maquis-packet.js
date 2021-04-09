@@ -24,12 +24,12 @@ class MaquisPacket {
 
   static decode(packet) {
     let packetBuf = new Uint8Array(packet);
-    if (packetBuf[0] == 0x00) {
+    if (packetBuf[0] == 0x00) { // underlying layer is removing 0x00 D:
       var decodedMessage = MaquisProto.decode(packetBuf.slice(1));
-
       return decodedMessage;
     } else {
       console.error('Unknown packet version: ', packetBuf[0]);
+      throw new Error('Unknown packet version', packetBuf[0]);
     }
     
   }
