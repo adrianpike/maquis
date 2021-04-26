@@ -3,7 +3,7 @@
 set pipefail -euo
 
 # hostapd config
-apt-get install -y dnsmasq iptables hostapd
+apt-get install -y dnsmasq iptables hostapd avahi-daemon
 cp dnsmasq.conf /etc/dnsmasq.conf
 cp hostapd.service /etc/systemd/system/hostapd@.service
 systemctl unmask hostapd.service

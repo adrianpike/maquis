@@ -2,6 +2,8 @@ import {h, render, Component, createRef} from 'preact';
 import 'normalize.css';
 import './style.css';
 
+import {Sha256} from '@aws-crypto/sha256-browser';
+
 const MaquisPacket = require('./maquis-packet.js');
 
 // Modes
@@ -35,24 +37,25 @@ class MessageLog extends Component {
     return <div id="messageLog">
       { messages.slice(0).reverse().map(function(msg) {
 
-let directionIcon;
-if (msg.direction === 'outgoing') {
-  directionIcon = '⬆';
-} else {
-  directionIcon = '⬇';
-}
+      let directionIcon;
+      let ackStatusIcon = '';
+      let retransmitButton = '';
+      if (msg.direction === 'outgoing') {
+        retransmitButton = <div class="retransmitButton">Retransmit</div>
 
-let ackStatusIcon;
-if (msg.requestAck) {
-  if (msg.acked) {
-    ackStatusIcon = '+';
-  } else {
-    ackStatusIcon = '?';
-  }
-} else {
-  ackStatusIcon = '';
-}
-let retransmitButton = <div class="retransmitButton">Retransmit</div>
+        if (msg.requestAck) {
+          if (msg.acked) {
+            ackStatusIcon = '+';
+            retransmitButton = '';
+          } else {
+            ackStatusIcon = '?';
+          }
+        }  
+        directionIcon = '⬆';
+      } else {
+        directionIcon = '⬇';
+      }
+
 
        return <div class="message">
         <div class="sender">{msg.sid}</div>
@@ -209,13 +212,35 @@ class MaquisBase extends Component {
       let packet = MaquisPacket.decode(rawPacket);
       if (packet.requestAck && packet.requestAck == true) {
         console.log('Received a message wanting an ack, doing so');
+        // TODO: when there's encryption, i should only ack things i can decrypt
+        let hash = new Sha256();
+        hash.update(rawPacket);
+
+        hash.digest().then((digest) => {
+          let ackPacket = {
+            msgHash: new TextDecoder().decode(digest),
+            ackerId: this.state.config.sid,
+            ts: new Date().getTime(),
+          }
+          const encodedPacket = MaquisPacket.encodeAck(ackPacket);
+          this.channel.transmit(encodedPacket);
+        });
       }
 
-      let message = Object.assign({}, packet);
-      message.acked = false;
-      message.direction = 'incoming'; // Don't like this, maybe an enum?
-
-      this.setState({ messages: this.state.messages.concat([message]) });
+      if (packet.ackerId) {
+        let newMessages = this.state.messages.map((message) => {
+          if (message.direction === 'outgoing' && message.digest == packet.msgHash) {
+            message.acked = true;
+          }
+          return message;
+        });
+        this.setState({ messages: newMessages });
+      } else {
+        let message = Object.assign({}, packet);
+        message.acked = false;
+        message.direction = 'incoming'; // Don't like this, maybe an enum?
+        this.setState({ messages: this.state.messages.concat([message]) });
+      }
     }
 
     if (this.state.config['mode'] === 'Websocket') {
@@ -257,7 +282,12 @@ class MaquisBase extends Component {
         let message = Object.assign({}, packet);
         message.acked = false;
         message.direction = 'outgoing'; // Don't like this
-        this.setState({ messages: this.state.messages.concat([message]) }); 
+        let hash = new Sha256();
+        hash.update(encodedPacket);
+        hash.digest().then((digest) => {
+          message.digest = new TextDecoder().decode(digest),
+          this.setState({ messages: this.state.messages.concat([message]) });
+        });
       }} />
       : <div id="disconnectionWarning">{this.state.config.mode} Backend <strong>not connected</strong>.</div>
       }

@@ -17,6 +17,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@aws-crypto/sha256-browser": "^1.1.0",
     "@babel/core": "^7.12.9",
     "@babel/plugin-transform-react-jsx": "^7.12.7",
     "@babel/preset-env": "^7.12.7",
