@@ -182,7 +182,8 @@ class MaquisBase extends Component {
           sid: this.state.config.sid,
           ts: new Date().getTime(),
           sig: '', // TODO
-          requestAck: true
+          requestAck: true,
+          type: 'message' // can also be [ack,coords]
         }
         const encodedPacket = MaquisPacket.encode(packet);
         channel.transmit(encodedPacket);
