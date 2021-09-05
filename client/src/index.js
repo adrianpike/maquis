@@ -6,110 +6,14 @@ import {Sha256} from '@aws-crypto/sha256-browser';
 
 const MaquisPacket = require('./maquis-packet.js');
 
-// Modes
-const Acoustic = require('./acoustic.js');
-const Websocket = require('./websocket.js');
-
+const Acoustic = require('./channels/acoustic.js');
+const Websocket = require('./channels/websocket.js');
 let acoustic = new Acoustic();
 let websocket = new Websocket();
 
-class MessageComposer extends Component {
-  render(props, { text }) {
-    return <form id="messageComposer" onSubmit={(e) => {
-      e.preventDefault();
-      if (typeof(text) === 'string' && text.length > 0) {
-        props.onSubmit(text);
-        this.setState({ text: '' });
-      }
-      return false;
-    }}>
-      <textarea value={this.state.text} onChange={(e) => {
-        this.setState({ text: e.target.value });
-      }}>{this.state.text}</textarea>
-      <input type="submit" value="Send" />
-    </form>
-  }
-}
-
-class MessageLog extends Component {
-  render({messages}) {
-
-    return <div id="messageLog">
-      { messages.slice(0).reverse().map(function(msg) {
-
-      let directionIcon;
-      let ackStatusIcon = '';
-      let retransmitButton = '';
-      if (msg.direction === 'outgoing') {
-        retransmitButton = <div class="retransmitButton">Retransmit</div>
-
-        if (msg.requestAck) {
-          if (msg.acked) {
-            ackStatusIcon = '+';
-            retransmitButton = '';
-          } else {
-            ackStatusIcon = '?';
-          }
-        }  
-        directionIcon = '⬆';
-      } else {
-        directionIcon = '⬇';
-      }
-
-
-       return <div class="message">
-        <div class="sender">{msg.sid}</div>
-        <div class="timestamp">
-          {msg.ts}
-          <span>{msg.receivedAt}</span>
-        </div>
-        <div class="controls">
-          {directionIcon}
-          {ackStatusIcon}
-          {retransmitButton}
-        </div>
-        <div class="body">{msg.body}</div>
-        </div>
-      }) }
-    </div>
-  }
-}
-
-class ConnectButton extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      error: null
-    }
-  }
-
-  render({ channel, success }) {
-    return <div><input type="button" value="Connect" onClick={() => {
-      channel.connect((err) => {
-        if (err) {
-          this.setState( { error: err.toString() })
-        } else {
-          success();
-        }
-      });
-    }} />{this.state.error}</div>
-  }
-}
-
-class ChannelStatus extends Component {
-  render({ channel, connected, onConnect }) {
-    return <div id="channelStatus">
-      { connected ? 'Connected' : <ConnectButton 
-        channel={channel}
-        success={() => { 
-          this.setState( { connected: true });
-          onConnect();
-        }}
-      />}
-    </div>
-  }
-}
+import MessageComposer from './components/MessageComposer';
+import MessageLog from './components/MessageLog';
+import ChannelStatus from './components/ChannelStatus';
 
 class ConfigPane extends Component {
   constructor({config}) {
@@ -244,8 +148,12 @@ class MaquisBase extends Component {
     }
 
     if (this.state.config['mode'] === 'Websocket') {
-      this.channel.connect(() => {
-        this.setState({ connected: true });
+      this.channel.connect((err) => {
+        if (!err) {
+          this.setState({ connected: true });
+        } else {
+          // BUG: dont ignore this, tis silly
+        }
       });
     }
 
