@@ -1,6 +1,5 @@
 const protobuf = require('protobufjs');
 
-// TODO: extract this into a .proto file
 var MaquisMessage = new protobuf.Type("MaquisMessage");
 MaquisMessage.add(new protobuf.Field("body", 1, "string"));
 MaquisMessage.add(new protobuf.Field("sid", 2, "string"));
@@ -20,9 +19,12 @@ class MaquisPacket {
     var msg = MaquisMessage.create(message);
     let protoBufArr = MaquisMessage.encode(msg).finish();
     
-    let packetBuf = new Uint8Array(protoBufArr.byteLength + 1);
+    let packetBuf = new Uint8Array(protoBufArr.byteLength + 2);
     packetBuf[0] = 0x00;
-    packetBuf.set(protoBufArr, 1);
+    packetBuf[1] = type;
+    packetBuf.set(protoBufArr, 2);
+
+    console.log(buf);
 
     return packetBuf;
   }
@@ -48,8 +50,8 @@ class MaquisPacket {
     } else if (packetBuf[0] == 0x01) {
       return AckProto.decode(packetBuf.slice(1));
     } else {
-      console.error('Unknown packet version: ', packetBuf[0]);
-      throw new Error('Unknown packet version', packetBuf[0]);
+      console.error('Unknown message type: ', packetBuf[0]);
+      throw new Error('Unknown message type', packetBuf[0]);
     }
     
   }

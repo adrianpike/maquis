@@ -1,0 +1,24 @@
+// maquis.proto
+syntax = "proto3";
+package maquis;
+
+message MaquisMessage {
+  string body = 1;
+  string sid = 2;
+  double ts = 3;
+  string sig = 4;
+  bool requestAck = 5;
+}
+
+message MaquisAck {
+  string sig = 1;
+  string ackerId = 2;
+  string ts = 3;
+}
+
+message MaquisProto {
+  oneof message {
+    MaquisAck ack = 1;
+    MaquisMessage msg = 2;
+  }
+}

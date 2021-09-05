@@ -6,7 +6,7 @@ class Acoustic {
     let AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new AudioContext();
 
-    // this is a good profile for webjack -> webjack, but Direwolf seems to struggle
+    // this is a good profile for webjack -> webjack, but Direwolf seems to struggle interpreting it
     this.profile = {
       baud: 300,
       freqLow: 1200,
@@ -16,7 +16,7 @@ class Acoustic {
       raw: true
     };
 /*
-    // Lets see if I can do packet radio compat :)
+    // Lets see if I can do X.25 radio compat someday
     this.profile = {
       baud: 1200, // Officially 1200, but.. sample rate :)
       freqLow: 1200,
