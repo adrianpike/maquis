@@ -1,8 +1,6 @@
 const ws = require('ws');
 
 class Websocket {
-  constructor() {
-  }
 
   connect(cb) {
     this.socket = new WebSocket(`ws://${document.location.hostname}:4242`);
@@ -14,7 +12,8 @@ class Websocket {
     });
 
     this.socket.addEventListener('error', (err) => {
-      cb(err);
+      console.log('Error connecting to websocket', err);
+      cb('Unable to connect.');
       this.connected = false;
     });
 
