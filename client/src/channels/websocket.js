@@ -2,14 +2,23 @@ const ws = require('ws');
 
 class Websocket {
 
+  constructor(config) {
+    this.config = config;
+  }
+
   connect(cb) {
-    this.socket = new WebSocket(`ws://${document.location.hostname}:4242`);
-    this.socket.binaryType = 'arraybuffer';
-    this.socket.addEventListener('message', (evt) => {
-      if (typeof(this.onMessage) === 'function') {
-        this.onMessage(evt.data);
-      }
-    });
+    try {
+      this.socket = new WebSocket(`ws://${this.config.url}`);
+      this.socket.binaryType = 'arraybuffer';
+      this.socket.addEventListener('message', (evt) => {
+        if (typeof(this.onMessage) === 'function') {
+          this.onMessage(evt.data);
+        }
+      });
+    } catch(e) {
+      cb('Unable to initialize websocket.');
+      return;
+    }
 
     this.socket.addEventListener('error', (err) => {
       console.log('Error connecting to websocket', err);

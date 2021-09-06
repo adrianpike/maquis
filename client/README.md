@@ -12,23 +12,30 @@ tinkering around with this.
 TODO
 ---
 
- [ ] Test framework
+Doing;
  [ ] Refactor the whole preact setup
- [ ] websocket mode includes metadata about underlying transport
+ [ ] Message encryption
+ [ ] Key handling;
+  [ ] Generation
+  [ ] Export PEM
+  [ ] Import PEM
+
+To Do;
+
+ [ ] Test framework
+ [ ] websocket mode when coming from commbloc includes metadata about underlying transport
  [ ] Request Ack setting
  [ ] Retransmit
  [ ] Message signing
- [ ] Message encryption
- [ ] raw message mode to bypass protobuf overhead
- [ ] Key import or generation
- [ ] Error log
-  [ ] Unable to transmit
+ [ ] Error state handling
+  [ ] Unable to decrypt
   [ ] Malformed receive
- [ ] Request ack mode
- [ ] Save last N messages
+ [ ] Save last N messages in LocalStorage
  [ ] Clear messages
  [ ] Hard wipe
- [ ] Message signing (WebCrypto + AESGCM)
  [ ] Automated testing & deployment.
- [ ] Extend Webjack to speak AX.25
-
+ [ ] Fork Webjack to support HDLC & 1200 AFSK correctly
+ [ ] Fancier Key Handling
+  [ ] QR Export
+  [ ] QR Import
+ [ ] Diffie-Hellman for asymmetric crypto

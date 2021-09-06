@@ -41,6 +41,7 @@ Path to 1.0
 Path to 2.0
 ---
 
-- [ ] Tighter interop with disaster.radio and Meshtastic
-- [ ] Stronger delivery guarantees
-- [ ] Basic routing across output modes.
+- [ ] Tighter interop with companion projects;
+   - disaster.radio
+   - Meshtastic
+   - ATAK

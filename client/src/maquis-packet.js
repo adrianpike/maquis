@@ -12,25 +12,27 @@ AckProto.add(new protobuf.Field('msgHash', 1, 'string'));
 AckProto.add(new protobuf.Field('ackerId', 2, 'string'));
 AckProto.add(new protobuf.Field("ts", 3, "double"));
 
+var GcmMessage = new protobuf.Type("MaquisGCMMessage");
+GcmMessage.add(new protobuf.Field("ciphertext", 1, "string"));
+GcmMessage.add(new protobuf.Field("iv", 2, "string"));
+GcmMessage.add(new protobuf.Field("auth", 3, "double"));
+
 class MaquisPacket {
   static encode(message) {
-    let version = '\x00'; // TODO: make this a nibble, first nibble is version, second is message type
+    let versionAndType = 0x00;
 
     var msg = MaquisMessage.create(message);
     let protoBufArr = MaquisMessage.encode(msg).finish();
     
-    let packetBuf = new Uint8Array(protoBufArr.byteLength + 2);
-    packetBuf[0] = 0x00;
-    packetBuf[1] = type;
-    packetBuf.set(protoBufArr, 2);
-
-    console.log(buf);
+    let packetBuf = new Uint8Array(protoBufArr.byteLength + 1);
+    packetBuf[0] = versionAndType;
+    packetBuf.set(protoBufArr, 1);
 
     return packetBuf;
   }
 
   static encodeAck(message) {
-    let version = '\x01'; // TODO: make this a nibble, first nibble is version, second is message type
+    let version = 0x01; // TODO: make this a nibble, first nibble is version, second is message type
 
     var msg = AckProto.create(message);
     let protoBufArr = AckProto.encode(msg).finish();
@@ -53,7 +55,6 @@ class MaquisPacket {
       console.error('Unknown message type: ', packetBuf[0]);
       throw new Error('Unknown message type', packetBuf[0]);
     }
-    
   }
 }
 

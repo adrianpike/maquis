@@ -1,7 +1,7 @@
 import {h, render, Component, createRef} from 'preact';
 
 class MessageLog extends Component {
-  render({messages}) {
+  render({messages, onRetransmit}) {
 
     return <div id="messageLog">
       { messages.slice(0).reverse().map(function(msg) {
@@ -24,7 +24,6 @@ class MessageLog extends Component {
       } else {
         directionIcon = '⬇';
       }
-
 
        return <div class="message">
         <div class="sender">{msg.sid}</div>

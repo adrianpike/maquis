@@ -2,7 +2,8 @@ const WebJack = require('webjack');
 
 class Acoustic {
 
-  constructor() {
+  constructor(config) {
+    console.log('ACOUSTIC CONSTRUCTOR', config);
     let AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new AudioContext();
 
