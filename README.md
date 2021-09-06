@@ -4,8 +4,9 @@ Maquis
 Maquis is a project for enabling resilient communication, even in the presence
 of signifigant adversaries.
 
-The client is a Javascript app that runs on a smartphone, and can either
-communicate directly via AFSK, or send messages through a Websocket backend.
+The client is a Javascript app that runs on end users' smartphones, and can send
+messages to each other. Messages can be transmitted directly via AFSK, or they
+can leverage a Websocket backend for expanded transport options.
 
 The reference backend is [commbloc](https://github.com/adrianpike/kiss-bridge),
 which can be configured with any number of TNC, [meshtastic](https://meshtastic.org/) and IP links.
@@ -26,9 +27,9 @@ Quickstart
 Directory Structure
 ---
 
-/client - The JS client itself.
-/server - The server containers and tooling to burn an image for a Pi.
-/esp32 - Firmware to run a server component on an ESP32 - this is a major WIP.
+ - `/client` - The JS client itself.
+ - `/server` - The server containers and tooling to burn an image for a Pi.
+ - `/esp32` - Firmware to run a server component on an ESP32 - this is a major WIP.
 
 Path to 1.0
 ---
@@ -41,5 +42,5 @@ Future Ideas
 - [ ] Tighter interop with companion projects;
    - disaster.radio
    - Meshtastic
-   - ATAK
+   - ATAK, maybe we can send/receive CoT's directly?
 - [ ] Client can directly leverage a TNC such as a mobilind. This is a blocker at the moment due to Web Bluetooth API limitations on Android.
