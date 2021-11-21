@@ -7,6 +7,7 @@ Wants=network.target
 
 [Service]
 Type=simple
+ExecStartPre=/usr/sbin/update_hostname.sh
 ExecStart=/usr/sbin/hostapd /etc/hostapd/hostapd-%I.conf
 
 [Install]
