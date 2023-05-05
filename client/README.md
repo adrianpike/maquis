@@ -3,7 +3,7 @@ maquis
 
 This is a Javascript app for broadcasting and receiving encrypted messages,
 either through https://github.com/publiclab/webjack, through a Websocket
-connection, or through BTLE serial.
+connection.
 
 *WARNING*: It can be unlawful, depending on your local jurisdiction, to transmit
 encrypted radio messages on certain frequencies. Please check your local laws before
@@ -13,29 +13,44 @@ TODO
 ---
 
 Doing;
- [ ] Refactor the whole preact setup
+ [ ] Refactor the whole thing.
+  [X] Extract all the backend into some classes.
+  [ ] Rewrite the frontend to be more modular and actually design it.
  [ ] Message encryption
+  [ ] Symmetric w/PSK
  [ ] Key handling;
   [ ] Generation
   [ ] Export PEM
   [ ] Import PEM
 
 To Do;
-
  [ ] Test framework
- [ ] websocket mode when coming from commbloc includes metadata about underlying transport
+ [ ] Tighter integration with commbloc as a websocket backend
  [ ] Request Ack setting
  [ ] Retransmit
- [ ] Message signing
+ [ ] Crypto Modes
+  [ ] Sign
+  [ ] Encrypt for Target
  [ ] Error state handling
   [ ] Unable to decrypt
   [ ] Malformed receive
  [ ] Save last N messages in LocalStorage
+ [ ] Offline mode
  [ ] Clear messages
  [ ] Hard wipe
  [ ] Automated testing & deployment.
- [ ] Fork Webjack to support HDLC & 1200 AFSK correctly
+ [ ] Rewrite Webjack
  [ ] Fancier Key Handling
   [ ] QR Export
   [ ] QR Import
- [ ] Diffie-Hellman for asymmetric crypto
+
+
+Crypto Modes
+---
+
+Symmetric with Bidirectional keyloading
+ - Easiest and lowest effort basic crypto.
+ - Why bidirectional? If a clever threat actor grabs a device, they'll exfil the key anyway.
+   Symmetric is fairly useless, but it at least works.
+
+Asymmetric with preshared PKI

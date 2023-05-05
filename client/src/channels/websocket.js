@@ -11,7 +11,7 @@ class Websocket {
       this.socket = new WebSocket(`ws://${this.config.url}`);
       this.socket.binaryType = 'arraybuffer';
       this.socket.addEventListener('message', (evt) => {
-        if (typeof(this.onMessage) === 'function') {
+        if (typeof(this.onMessage) === 'function') { // TODO: rename to onPacket to match the Node
           this.onMessage(evt.data);
         }
       });

@@ -12,6 +12,7 @@ export default class MaquisConfig extends Component {
     return <div id="config">
       <form onSubmit={(e) => {
         e.preventDefault();
+        // This usually will have to reinstantiate the client and the key, maybe we just refresh the whole thing?
         onSubmit(this.state);
         return false;
       }}>
@@ -38,9 +39,12 @@ export default class MaquisConfig extends Component {
         </label>
 
         <label>Crypto Mode:
-          <select name="cryptoMode">
-              <option value="none" selected>None</option>
-              <option value="encrypt">Encrypt Messages</option>
+          <select name="cryptoMode" value={this.state.cryptoMode} onChange={(e) => {
+            this.setState({ cryptoMode: e.target.value });
+          }}>
+              <option value="none">None</option>
+              <option value="sign">Sign Messages</option>
+              <option value="aes">AES-GCM</option>
             </select>
         </label>
         
