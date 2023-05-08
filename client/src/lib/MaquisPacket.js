@@ -12,11 +12,6 @@ AckProto.add(new protobuf.Field('msgHash', 1, 'string'));
 AckProto.add(new protobuf.Field('ackerId', 2, 'string'));
 AckProto.add(new protobuf.Field("ts", 3, "double"));
 
-var GcmMessage = new protobuf.Type("MaquisGCMMessage");
-GcmMessage.add(new protobuf.Field("ciphertext", 1, "string"));
-GcmMessage.add(new protobuf.Field("iv", 2, "string"));
-GcmMessage.add(new protobuf.Field("auth", 3, "double"));
-
 class MaquisPacket {
   static encode(message) {
     let versionAndType = 0x00;

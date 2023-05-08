@@ -55,6 +55,7 @@ export class MaquisNode {
     if (this.config['cryptoMode'] == 'aes') {
       console.log('attempting decrypt');
       let iv = window.crypto.getRandomValues(new Uint8Array(12));
+      iv = new Uint8Array(12);
       window.crypto.subtle.decrypt(
         { name: 'AES-GCM', iv: iv },
         this.key,
@@ -124,14 +125,15 @@ export class MaquisNode {
     }
     const encodedPacket = MaquisPacket.encode(packet);
     // THINK: should this be also wrapped somehow? Should encrypted packets get acked?
+    // TODO: actually do the encrypted message type
     if (1==1 || this.config.cryptoMode == 'aes') { // DEBUGGIN
       let iv = window.crypto.getRandomValues(new Uint8Array(12));
+      iv = new Uint8Array(12);
       window.crypto.subtle.encrypt(
         { name: 'AES-GCM', iv: iv },
         this.key,
         encodedPacket 
       ).then((encrypted) => {
-        console.log(encrypted);
         this.channel.transmit(encrypted);
 
         let message = Object.assign({}, packet);
