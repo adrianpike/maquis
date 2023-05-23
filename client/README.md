@@ -13,11 +13,13 @@ TODO
 ---
 
 Doing;
+ [ ] Rewrite the audio transmit/receive setup
  [ ] Refactor the whole thing.
   [X] Extract all the backend into some classes.
+  [ ] Promisify a lot of the async style.
   [ ] Rewrite the frontend to be more modular and actually design it.
  [ ] Message encryption
-  [ ] Symmetric w/PSK
+  [X] Symmetric w/AES
  [ ] Key handling;
   [ ] Generation
   [ ] Export PEM

@@ -49,29 +49,22 @@ export class MaquisNode {
   }
 
   onPacket(rawPacket) {
-    console.log(rawPacket);
     let packet;
     // If we're in a crypto mode, we must decode
     if (this.config['cryptoMode'] == 'aes') {
-      console.log('attempting decrypt');
       let iv = window.crypto.getRandomValues(new Uint8Array(12));
       iv = new Uint8Array(12);
+      console.log(rawPacket);
       window.crypto.subtle.decrypt(
         { name: 'AES-GCM', iv: iv },
         this.key,
         rawPacket 
       ).then((decrypted) => {
-        console.log(decrypted);
-
         packet = MaquisPacket.decode(decrypted);
-
         console.log(packet);
- 
       }).catch((err) => {
         console.log('Decryption error', err);
       });
-
-      return;
     } else {
       packet = MaquisPacket.decode(rawPacket);
     }
@@ -135,6 +128,8 @@ export class MaquisNode {
         encodedPacket 
       ).then((encrypted) => {
         this.channel.transmit(encrypted);
+
+        console.log(encrypted, this.key, iv);
 
         let message = Object.assign({}, packet);
         message.acked = false;

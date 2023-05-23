@@ -1,9 +1,7 @@
 const WebJack = require('webjack');
 
 class Acoustic {
-
   constructor(config) {
-    console.log('ACOUSTIC CONSTRUCTOR', config);
     let AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new AudioContext();
 
@@ -13,8 +11,8 @@ class Acoustic {
       freqLow: 1200,
       freqHigh: 2400,
       echoCancellation: false,
-      softmodem: false,
-      raw: true
+      softmodem: false, // This adds extra bits over the wire
+      raw: true // This gives me a Buffer vs. a String
     };
 /*
     // Lets see if I can do X.25 radio compat someday
