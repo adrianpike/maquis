@@ -19,7 +19,7 @@ export default class MaquisConfig extends Component {
           <select name="mode" value={this.state.mode} onChange={(e) => {
             this.setState({ mode: e.target.value }); 
           }}>
-            { ['Acoustic', 'Websocket'].map((mode) => {
+            { ['Acoustic', 'Commbloc', 'Sneakerdrop'].map((mode) => {
               return <option value={mode}>{mode}</option>;
             }) }
           </select>
