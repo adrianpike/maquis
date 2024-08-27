@@ -13,7 +13,6 @@ TODO
 ---
 
 Doing;
- [ ] Refactor the whole preact setup
  [ ] Message encryption
  [ ] Key handling;
   [ ] Generation
@@ -22,6 +21,7 @@ Doing;
 
 To Do;
 
+ [ ] Offline mode
  [ ] Test framework
  [ ] websocket mode when coming from commbloc includes metadata about underlying transport
  [ ] Request Ack setting
