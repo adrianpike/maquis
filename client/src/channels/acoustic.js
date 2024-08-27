@@ -3,9 +3,6 @@ const WebJack = require('webjack');
 class Acoustic {
 
   constructor(config) {
-    console.log('ACOUSTIC CONSTRUCTOR', config);
-    let AudioContext = window.AudioContext || window.webkitAudioContext;
-    this.audioContext = new AudioContext();
 
     // this is a good profile for webjack -> webjack, but Direwolf seems to struggle interpreting it
     this.profile = {
@@ -32,18 +29,26 @@ class Acoustic {
   }
 
   connect(cb) {
-    try {
-      this.audioConnection = new WebJack.Connection(this.profile);
-      window.ac = this.audioConnection;
-      this.audioConnection.listen((data) => {
-        if (typeof(this.onMessage) === 'function') {
-          this.onMessage(data);
-        }
-      });
-      this.connected = true;
-      cb();
-    } catch (e) {
-      cb(e);
+    if (navigator.mediaDevices) {
+      let AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.audioContext = new AudioContext();
+
+      try {
+        this.audioConnection = new WebJack.Connection(this.profile);
+        window.ac = this.audioConnection;
+        this.audioConnection.listen((data) => {
+          if (typeof(this.onMessage) === 'function') {
+            this.onMessage(data);
+          }
+        });
+        this.connected = true;
+        cb();
+      } catch (e) {
+        debugger
+        cb(e);
+      }
+    } else {
+      cb("No Audio devices available.");
     }
   }
 

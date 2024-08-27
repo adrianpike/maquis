@@ -1,4 +1,20 @@
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonText, IonIcon } from '@ionic/react';
+import { arrowUpCircleOutline } from 'ionicons/icons';
+
 import {h, render, Component, createRef} from 'preact';
+
+class Message extends Component {
+  render(msg) {
+
+
+  }
+}
+
+class Timestamp extends Component {
+  render({ts}) {
+    return <div>{ts}</div>
+  }
+}
 
 class MessageLog extends Component {
   render({messages, onRetransmit}) {
@@ -10,8 +26,6 @@ class MessageLog extends Component {
       let ackStatusIcon = '';
       let retransmitButton = '';
       if (msg.direction === 'outgoing') {
-        retransmitButton = <div class="retransmitButton">Retransmit</div>
-
         if (msg.requestAck) {
           if (msg.acked) {
             ackStatusIcon = '+';
@@ -20,24 +34,36 @@ class MessageLog extends Component {
             ackStatusIcon = '?';
           }
         }  
-        directionIcon = '⬆';
+        directionIcon = arrowUpCircleOutline;
       } else {
         directionIcon = '⬇';
       }
 
-       return <div class="message">
-        <div class="sender">{msg.sid}</div>
-        <div class="timestamp">
-          {msg.ts}
-          <span>{msg.receivedAt}</span>
-        </div>
-        <div class="controls">
-          {directionIcon}
-          {ackStatusIcon}
-          {retransmitButton}
-        </div>
-        <div class="body">{msg.body}</div>
-        </div>
+       return <IonCard>
+        <IonCardHeader>
+          <IonCardTitle>
+            {msg.sid}
+          </IonCardTitle>
+
+          <IonCardSubtitle>
+            <Timestamp ts={msg.ts} label="Timestamp" />
+            <Timestamp ts={msg.receivedAt} label="Received At"/>
+            <IonIcon icon={directionIcon}></IonIcon>
+            <IonIcon icon={ackStatusIcon}></IonIcon>
+          </IonCardSubtitle>
+        </IonCardHeader>
+        <IonCardContent>
+          <IonText color="primary">
+            <h1>{msg.body}</h1>
+          </IonText>
+        </IonCardContent>
+        <IonButton
+          onClick={() => {
+            onRetransmit(msg.body)
+          }}
+        >Retransmit</IonButton>
+       </IonCard>
+
       }) }
     </div>
   }

@@ -29,13 +29,24 @@ module.exports = {
   },
   mode: 'development',
   devServer: {
-    contentBase: path.join(__dirname, 'build'),
+    static: {
+      directory: path.join(__dirname, 'build')
+    },
     compress: true,
     host: '0.0.0.0', // wsl2, man
     port: 4200,
-    disableHostCheck: true,
+    allowedHosts: "all",
+
   },
   watchOptions: {
     poll: 1000 // Check for changes every second
+  },
+  "resolve": {
+    "alias": {
+      "react": "preact/compat",
+      "react-dom/test-utils": "preact/test-utils",
+      "react-dom": "preact/compat",     // Must be below test-utils
+      "react/jsx-runtime": "preact/jsx-runtime"
+    },
   }
 };
