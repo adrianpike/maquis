@@ -15,7 +15,6 @@ AckProto.add(new protobuf.Field("ts", 3, "double"));
 var GcmMessage = new protobuf.Type("MaquisGCMMessage");
 GcmMessage.add(new protobuf.Field("ciphertext", 1, "string"));
 GcmMessage.add(new protobuf.Field("iv", 2, "string"));
-GcmMessage.add(new protobuf.Field("auth", 3, "double"));
 
 class MaquisPacket {
   static encode(message) {
@@ -44,16 +43,46 @@ class MaquisPacket {
     return packetBuf;
   }
 
-
-  static decode(packet) {
+  static decode(packet, options) {
     let packetBuf = new Uint8Array(packet);
     if (packetBuf[0] == 0x00) {
       return MaquisMessage.decode(packetBuf.slice(1));
     } else if (packetBuf[0] == 0x01) {
       return AckProto.decode(packetBuf.slice(1));
+    } else if (packetBuf[0] == 0x02) {
+      // It's a wrapped symmetric crypto packet - the inner one can be either an ack or a message, so we'll decrypt & then re-decode
+      console.log('attempting decrypt');
+      var protobufPacket = GcmMessage.decode(packetBuf.slice(1));
+
+      let b64 = atob(options.symmetricKey);
+      const buf = new ArrayBuffer(b64.length);
+      const bufView = new Uint8Array(buf);
+      for (let i = 0, strLen = b64.length; i < strLen; i++) {
+        bufView[i] = b64.charCodeAt(i);
+      }
+      
+      let key = window.crypto.subtle.importKey(
+        "raw",
+        bufView,
+        "AES-GCM",
+        true,
+        ["encrypt", "decrypt"]
+      ).then((key) => {
+        let iv = window.crypto.getRandomValues(new Uint8Array(12));
+        let encrypted = window.crypto.subtle.decrypted(
+          { name: 'AES-GCM', iv: protobufPacket.iv },
+          key,
+          protobufPacket.ciphertext
+        );
+        encrypted.then((value) => { 
+          console.log(value);
+        });
+      });
+
+      
     } else {
       console.error('Unknown message type: ', packetBuf[0]);
-      throw new Error('Unknown message type', packetBuf[0]);
+      // throw new Error('Unknown message type, ignoring', packetBuf[0]);
     }
   }
 }

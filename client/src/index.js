@@ -73,7 +73,7 @@ class MaquisBase extends Component {
   
   applyConfig() {
     switch(this.state.config['mode']) {
-      case 'Websocket':
+      case 'Commbloc':
       this.channel = new Websocket(this.state.config.modeConfig);;
       break;
       default:
@@ -94,37 +94,42 @@ class MaquisBase extends Component {
   }
   
   onMessage(rawPacket) {
-    let packet = MaquisPacket.decode(rawPacket);
-    if (packet.requestAck && packet.requestAck == true) {
-      // TODO: when there's encryption, i should only ack things i can decrypt
-      let hash = new Sha256();
-      hash.update(rawPacket);
+    let packet = MaquisPacket.decode(rawPacket, {symmetricKey: this.state.config.symmetricKey });
+    if (packet) {
+      if (packet.requestAck && packet.requestAck == true) {
+        // TODO: when there's encryption, i should only ack things i can decrypt
+        let hash = new Sha256();
+        hash.update(rawPacket);
+        
+        hash.digest().then((digest) => {
+          let ackPacket = {
+            msgHash: new TextDecoder().decode(digest),
+            ackerId: this.state.config.sid,
+            ts: new Date().getTime(),
+          }
+          const encodedPacket = MaquisPacket.encodeAck(ackPacket);
+          debugger;
+          this.channel.transmit(encodedPacket);
+        });
+      }
       
-      hash.digest().then((digest) => {
-        let ackPacket = {
-          msgHash: new TextDecoder().decode(digest),
-          ackerId: this.state.config.sid,
-          ts: new Date().getTime(),
-        }
-        const encodedPacket = MaquisPacket.encodeAck(ackPacket);
-        debugger;
-        this.channel.transmit(encodedPacket);
-      });
-    }
-    
-    if (packet.ackerId) {
-      let newMessages = this.state.messages.map((message) => {
-        if (message.direction === 'outgoing' && message.digest == packet.msgHash) {
-          message.acked = true;
-        }
-        return message;
-      });
-      this.setState({ messages: newMessages });
+      if (packet.ackerId) {
+        let newMessages = this.state.messages.map((message) => {
+          if (message.direction === 'outgoing' && message.digest == packet.msgHash) {
+            message.acked = true;
+          }
+          return message;
+        });
+        this.setState({ messages: newMessages });
+      } else {
+        let message = Object.assign({}, packet);
+        message.acked = false;
+        message.direction = 'incoming'; // Don't like this, maybe an enum?
+        this.setState({ messages: this.state.messages.concat([message]) });
+      }
+
     } else {
-      let message = Object.assign({}, packet);
-      message.acked = false;
-      message.direction = 'incoming'; // Don't like this, maybe an enum?
-      this.setState({ messages: this.state.messages.concat([message]) });
+      
     }
   }
   
@@ -134,13 +139,12 @@ class MaquisBase extends Component {
       sid: this.state.config.sid,
       ts: new Date().getTime(),
       sig: '', // TODO
-      requestAck: true,
+      requestAck: this.state.config.requestAck,
       type: 'message' // can also be [ack,coords]
     }
     const encodedPacket = MaquisPacket.encode(packet);
     
     if (this.state.config.cryptoMode != 'none') { // DEBUGGIN
-      console.log('encrypting packet...');
       let b64 = atob(this.state.config.symmetricKey);
       const buf = new ArrayBuffer(b64.length);
       const bufView = new Uint8Array(buf);
@@ -154,18 +158,21 @@ class MaquisBase extends Component {
         "AES-GCM",
         true,
         ["encrypt", "decrypt"]
-      ).then(function(key) {
+      ).then((key) => {
         let iv = window.crypto.getRandomValues(new Uint8Array(12));
         let encrypted = window.crypto.subtle.encrypt(
           { name: 'AES-GCM', iv: iv },
           key,
           encodedPacket
         );
-        window.encrypted = encrypted;
+        encrypted.then((value) => { 
+          this.channel.transmit(value);
+        });
       });
+    } else {
+      this.channel.transmit(encodedPacket);
     }
     
-    this.channel.transmit(encodedPacket);
     
     let message = Object.assign({}, packet);
     message.acked = false;
@@ -220,23 +227,19 @@ class MaquisBase extends Component {
         </ion-content>
         </IonApp>)
         
-      }
-    }
-    
+  }
+}
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').then(registration => {
-          console.log('SW registered: ', registration);
-        }).catch(registrationError => {
-          console.log('SW registration failed: ', registrationError);
-        });
-      });
-    }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(registration => {
+      console.log('SW registered: ', registration);
+    }).catch(registrationError => {
+      console.log('SW registration failed: ', registrationError);
+    });
+  });
+}
 
-
-
-    render((
-      <MaquisBase />
-    ), document.body);
-    
+render((
+  <MaquisBase />
+), document.body);

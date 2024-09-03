@@ -13,19 +13,17 @@ TODO
 ---
 
 Doing;
+ [ ] convert websocket to commbloc - either disable or ignore broadcast beacons, and maybe ignore non-maquis packets?
  [ ] Message encryption
  [ ] Key handling;
-  [ ] Generation
+  [ ] Generation for symmetric
   [ ] Export PEM
   [ ] Import PEM
+ [ ] Asymmetric crypto
 
 To Do;
 
- [ ] Offline mode
  [ ] Test framework
- [ ] websocket mode when coming from commbloc includes metadata about underlying transport
- [ ] Request Ack setting
- [ ] Retransmit
  [ ] Message signing
  [ ] Error state handling
   [ ] Unable to decrypt
@@ -35,7 +33,11 @@ To Do;
  [ ] Hard wipe
  [ ] Automated testing & deployment.
  [ ] Fork Webjack to support HDLC & 1200 AFSK correctly
- [ ] Fancier Key Handling
-  [ ] QR Export
-  [ ] QR Import
  [ ] Diffie-Hellman for asymmetric crypto
+
+
+Crypto Stream of consciousness notes;
+- AES-GCM requires IV & body
+- signing requires cleartext
+- should ack's be encrypted?
+  - yes

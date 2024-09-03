@@ -43,12 +43,15 @@ export default class MaquisConfig extends Component {
           </IonItem>
             
           <IonItem>
-           <IonSelect label="Crypto Mode" name="cryptoMode">
+           <IonSelect label="Crypto Mode" name="cryptoMode" value={this.state.cryptoMode} onIonChange={(e) => {
+              this.setState({ cryptoMode: e.target.value }); 
+            }}>
               <IonSelectOption value="none" selected>None</IonSelectOption>
-              <IonSelectOption value="encrypt">Encrypt Messages</IonSelectOption>
+              <IonSelectOption value="symmetric">Symmetric AES-GCM</IonSelectOption>
             </IonSelect>
           </IonItem>
 
+          {this.state.cryptoMode == "symmetric" &&
           <IonItem>
             <IonTextarea name="symmetricKey" label="Symmetric Key" onIonChange={(e) => {
               this.setState({ symmetricKey: e.target.value });
@@ -80,9 +83,14 @@ export default class MaquisConfig extends Component {
               </IonButton>
             </IonTextarea>
           </IonItem>
+          }
 
           <IonItem>
-            <IonCheckbox type="checkbox" name="requestAck" value="true">Request Acknowledgement</IonCheckbox>
+            <IonCheckbox type="checkbox" name="requestAck" value="true" checked={this.state.requestAck}
+              onIonChange={(e) => {
+                this.setState({ requestAck: e.target.checked })
+              }}
+              >Request Acknowledgement</IonCheckbox>
           </IonItem>
 
           <IonItem lines="none">

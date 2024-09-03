@@ -1,5 +1,5 @@
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonText, IonIcon } from '@ionic/react';
-import { arrowUpCircleOutline } from 'ionicons/icons';
+import { arrowUpCircleOutline, arrowDownCircleOutline, checkmarkCircleOutline, helpCircleOutline } from 'ionicons/icons';
 
 import {h, render, Component, createRef} from 'preact';
 
@@ -18,38 +18,37 @@ class Timestamp extends Component {
 
 class MessageLog extends Component {
   render({messages, onRetransmit}) {
+    console.log(messages);
 
     return <div id="messageLog">
       { messages.slice(0).reverse().map(function(msg) {
 
       let directionIcon;
       let ackStatusIcon = '';
-      let retransmitButton = '';
       if (msg.direction === 'outgoing') {
         if (msg.requestAck) {
           if (msg.acked) {
-            ackStatusIcon = '+';
-            retransmitButton = '';
+            ackStatusIcon = checkmarkCircleOutline;
           } else {
-            ackStatusIcon = '?';
+            ackStatusIcon = helpCircleOutline;
           }
         }  
         directionIcon = arrowUpCircleOutline;
       } else {
-        directionIcon = '⬇';
+        directionIcon = arrowDownCircleOutline;
       }
 
        return <IonCard>
         <IonCardHeader>
           <IonCardTitle>
             {msg.sid}
+            <IonIcon icon={directionIcon}></IonIcon>
+            <IonIcon icon={ackStatusIcon}></IonIcon>
           </IonCardTitle>
 
           <IonCardSubtitle>
             <Timestamp ts={msg.ts} label="Timestamp" />
             <Timestamp ts={msg.receivedAt} label="Received At"/>
-            <IonIcon icon={directionIcon}></IonIcon>
-            <IonIcon icon={ackStatusIcon}></IonIcon>
           </IonCardSubtitle>
         </IonCardHeader>
         <IonCardContent>
