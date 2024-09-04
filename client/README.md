@@ -14,7 +14,7 @@ TODO
 
 Doing;
  [ ] convert websocket to commbloc - either disable or ignore broadcast beacons, and maybe ignore non-maquis packets?
- [ ] Message encryption
+ [ ] Show an indicator if a message was encrypted or not
  [ ] Key handling;
   [ ] Generation for symmetric
   [ ] Export PEM
@@ -32,12 +32,5 @@ To Do;
  [ ] Clear messages
  [ ] Hard wipe
  [ ] Automated testing & deployment.
- [ ] Fork Webjack to support HDLC & 1200 AFSK correctly
+ [ ] Rewrite Acoustic mode to speak correct AX.25 / Bell 202 or Bell 103 for lower quality links
  [ ] Diffie-Hellman for asymmetric crypto
-
-
-Crypto Stream of consciousness notes;
-- AES-GCM requires IV & body
-- signing requires cleartext
-- should ack's be encrypted?
-  - yes

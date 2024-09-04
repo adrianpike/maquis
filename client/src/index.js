@@ -93,47 +93,47 @@ class MaquisBase extends Component {
     }
   }
   
-  onMessage(rawPacket) {
-    let packet = MaquisPacket.decode(rawPacket, {symmetricKey: this.state.config.symmetricKey });
-    if (packet) {
-      if (packet.requestAck && packet.requestAck == true) {
-        // TODO: when there's encryption, i should only ack things i can decrypt
-        let hash = new Sha256();
-        hash.update(rawPacket);
+  async onMessage(rawPacket) {
+    try {
+      let packet = await MaquisPacket.decode(rawPacket, {symmetricKey: this.state.config.symmetricKey });
+      if (packet) {
+        if (packet.requestAck && packet.requestAck == true) {
+          // TODO: when there's encryption, i should only ack things i can decrypt
+          let hash = new Sha256();
+          hash.update(rawPacket);
+          
+          hash.digest().then((digest) => {
+            let ackPacket = {
+              msgHash: new TextDecoder().decode(digest),
+              ackerId: this.state.config.sid,
+              ts: new Date().getTime(),
+            }
+            const encodedPacket = MaquisPacket.encodeAck(ackPacket);
+            this.channel.transmit(encodedPacket);
+          });
+        }
         
-        hash.digest().then((digest) => {
-          let ackPacket = {
-            msgHash: new TextDecoder().decode(digest),
-            ackerId: this.state.config.sid,
-            ts: new Date().getTime(),
-          }
-          const encodedPacket = MaquisPacket.encodeAck(ackPacket);
-          debugger;
-          this.channel.transmit(encodedPacket);
-        });
+        if (packet.ackerId) {
+          let newMessages = this.state.messages.map((message) => {
+            if (message.direction === 'outgoing' && message.digest == packet.msgHash) {
+              message.acked = true;
+            }
+            return message;
+          });
+          this.setState({ messages: newMessages });
+        } else {
+          let message = Object.assign({}, packet);
+          message.acked = false;
+          message.direction = 'incoming'; // Don't like this, maybe an enum?
+          this.setState({ messages: this.state.messages.concat([message]) });
+        }
       }
-      
-      if (packet.ackerId) {
-        let newMessages = this.state.messages.map((message) => {
-          if (message.direction === 'outgoing' && message.digest == packet.msgHash) {
-            message.acked = true;
-          }
-          return message;
-        });
-        this.setState({ messages: newMessages });
-      } else {
-        let message = Object.assign({}, packet);
-        message.acked = false;
-        message.direction = 'incoming'; // Don't like this, maybe an enum?
-        this.setState({ messages: this.state.messages.concat([message]) });
-      }
-
-    } else {
-      
+    } catch(e) {
+      console.error(e);
     }
   }
   
-  sendMessage(messageBody) {
+  async sendMessage(messageBody) {
     let packet = {
       body: messageBody,
       sid: this.state.config.sid,
@@ -142,37 +142,9 @@ class MaquisBase extends Component {
       requestAck: this.state.config.requestAck,
       type: 'message' // can also be [ack,coords]
     }
-    const encodedPacket = MaquisPacket.encode(packet);
-    
-    if (this.state.config.cryptoMode != 'none') { // DEBUGGIN
-      let b64 = atob(this.state.config.symmetricKey);
-      const buf = new ArrayBuffer(b64.length);
-      const bufView = new Uint8Array(buf);
-      for (let i = 0, strLen = b64.length; i < strLen; i++) {
-        bufView[i] = b64.charCodeAt(i);
-      }    
-      
-      let key = window.crypto.subtle.importKey(
-        "raw",
-        bufView,
-        "AES-GCM",
-        true,
-        ["encrypt", "decrypt"]
-      ).then((key) => {
-        let iv = window.crypto.getRandomValues(new Uint8Array(12));
-        let encrypted = window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv: iv },
-          key,
-          encodedPacket
-        );
-        encrypted.then((value) => { 
-          this.channel.transmit(value);
-        });
-      });
-    } else {
-      this.channel.transmit(encodedPacket);
-    }
-    
+    const encodedPacket = await MaquisPacket.encode(packet, {symmetricKey: this.state.config.symmetricKey, cryptoMode: this.state.config.cryptoMode });
+
+    this.channel.transmit(encodedPacket);
     
     let message = Object.assign({}, packet);
     message.acked = false;
