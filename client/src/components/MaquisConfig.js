@@ -1,6 +1,8 @@
 import {h, render, Component, createRef} from 'preact';
 import ModeConfig from './ModeConfig';
 import { IonList, IonItem, IonSelect, IonSelectOption, IonInput, IonTextarea, IonButton, IonCheckbox } from '@ionic/react';
+import QRKey from './QRKey.js';
+import QRScanner from './QRScanner.js';
 
 
 export default class MaquisConfig extends Component {
@@ -81,7 +83,11 @@ export default class MaquisConfig extends Component {
               >
                 Generate
               </IonButton>
+
+
             </IonTextarea>
+            <QRKey sKey={this.state.symmetricKey} />
+            <QRScanner />
           </IonItem>
           }
 
