@@ -1,9 +1,24 @@
 import {h, render, Component, createRef} from 'preact';
-import {IonItem, IonInput } from '@ionic/react';
+import {IonItem, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
 
 class AcousticConfig extends Component {
   render() {
     return <em></em>
+  }
+}
+
+class MeshtasticConfig extends Component {
+  render({config, setState}) {
+    return <IonItem>
+            <IonSelect label="Connection Type" placeholder="Connection Type"
+            name="connectionType" value={config.connectionType} onIonChange={(e) => {
+              setState({ connectionType: e.target.value }); 
+            }}>
+              { ['BLE', 'Serial'].map((connectionType) => {
+                  return <IonSelectOption value={connectionType}>{connectionType}</IonSelectOption>;
+                }) }
+            </IonSelect>
+          </IonItem>
   }
 }
 
@@ -28,6 +43,13 @@ class ModeConfig extends Component {
             modeConfig: e
           });
         }} />
+        break;
+      case 'Meshtastic' :
+        return <MeshtasticConfig config={config} setState={(e) => {
+          setState({ // This is pretty gross, got to be a better way
+            modeConfig: e
+          });
+         }} />
         break;
       case 'Acoustic':
         return <AcousticConfig />

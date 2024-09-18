@@ -16,7 +16,7 @@ Doing;
  [ ] convert websocket to commbloc - either disable or ignore broadcast beacons, and maybe ignore non-maquis packets?
  [ ] Show an indicator if a message was encrypted or not
  [ ] Key handling;
-  [ ] Generation for symmetric
+  [ ] Symetric QR code load/store
   [ ] Export PEM
   [ ] Import PEM
  [ ] Asymmetric crypto

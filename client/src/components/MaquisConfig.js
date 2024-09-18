@@ -24,7 +24,7 @@ export default class MaquisConfig extends Component {
             name="mode" value={this.state.mode} onIonChange={(e) => {
               this.setState({ mode: e.target.value }); 
             }}>
-              { ['Acoustic', 'Commbloc', 'Sneakerdrop'].map((mode) => {
+              { ['Acoustic', 'Commbloc', 'Meshtastic', 'Sneakerdrop'].map((mode) => {
                   return <IonSelectOption value={mode}>{mode}</IonSelectOption>;
                 }) }
             </IonSelect>

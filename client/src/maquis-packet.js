@@ -19,6 +19,7 @@ GcmMessage.add(new protobuf.Field("iv", 2, "bytes"));
 class MaquisPacket {
   static async encode(message, options) {
     let versionAndType = 0x00;
+    options = options || {};
 
     var msg = MaquisMessage.create(message);
     let protoBufArr = MaquisMessage.encode(msg).finish();
@@ -27,7 +28,7 @@ class MaquisPacket {
     packetBuf[0] = versionAndType;
     packetBuf.set(protoBufArr, 1);
     
-    if (options.cryptoMode != 'none') {
+    if (options.cryptoMode && options.cryptoMode != 'none') {
       let b64 = atob(options.symmetricKey);
       const buf = new ArrayBuffer(b64.length);
       const bufView = new Uint8Array(buf);

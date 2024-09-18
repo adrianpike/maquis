@@ -4,7 +4,6 @@ import './style.css';
 
 import '@ionic/react/css/core.css';
 import { setupIonicReact } from '@ionic/react';
-
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
@@ -21,12 +20,13 @@ import { IonApp } from '@ionic/react';
 import { IonButton, IonIcon } from '@ionic/react';
 import { cog } from 'ionicons/icons';
 
-
 import {Sha256} from '@aws-crypto/sha256-js';
 
 const MaquisPacket = require('./maquis-packet.js');
 
 const Acoustic = require('./channels/acoustic.js');
+import Meshtastic from './channels/meshtastic.js';
+
 const Websocket = require('./channels/websocket.js');
 
 import MessageComposer from './components/MessageComposer';
@@ -74,7 +74,10 @@ class MaquisBase extends Component {
   applyConfig() {
     switch(this.state.config['mode']) {
       case 'Commbloc':
-      this.channel = new Websocket(this.state.config.modeConfig);;
+        this.channel = new Websocket(this.state.config.modeConfig);
+      break;
+      case 'Meshtastic':
+        this.channel = new Meshtastic(this.state.config.modeConfig);
       break;
       default:
       this.channel = new Acoustic(this.state.config.modeConfig);
@@ -142,8 +145,8 @@ class MaquisBase extends Component {
       requestAck: this.state.config.requestAck,
       type: 'message' // can also be [ack,coords]
     }
+    
     const encodedPacket = await MaquisPacket.encode(packet, {symmetricKey: this.state.config.symmetricKey, cryptoMode: this.state.config.cryptoMode });
-
     this.channel.transmit(encodedPacket);
     
     let message = Object.assign({}, packet);

@@ -24,6 +24,7 @@
     "@babel/plugin-transform-react-jsx": "^7.12.7",
     "@babel/preset-env": "^7.12.7",
     "@ionic/react": "^8.2.6",
+    "@meshtastic/js": "^2.3.7-5",
     "css-loader": "^5.0.1",
     "normalize.css": "^8.0.1",
     "preact": "^10.5.7",
